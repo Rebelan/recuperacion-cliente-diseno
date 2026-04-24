@@ -2,6 +2,9 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
+@tailwind utilities;
+@import "./styles/components.css";
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -116,7 +119,10 @@
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
 }
-
+body{
+  margin: 0;
+  box-sizing: border-box;
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;
