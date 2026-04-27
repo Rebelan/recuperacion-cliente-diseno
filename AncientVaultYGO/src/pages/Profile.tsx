@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Navigate } from "react-router-dom"
 
 import {
@@ -14,20 +14,29 @@ import { Textarea } from "../components/ui/textarea"
 import { Badge } from "../components/ui/badge"
 
 import { useAuthStore } from "../store/auth.store"
-import { getProfileById, updateProfile } from "../services/profile.service"
+import {
+  getProfileById,
+  updateProfile,
+  updateAvatar,
+} from "../services/profile.service"
+import { uploadAvatar } from "../services/avatar.service"
 
 import type { Profile as ProfileType } from "../types/profile"
 
 export default function Profile() {
   const user = useAuthStore((state) => state.user)
   const loadingAuth = useAuthStore((state) => state.loading)
+  const setStoreProfile = useAuthStore((state) => state.setProfile)
 
   const [profile, setProfile] = useState<ProfileType | null>(null)
   const [username, setUsername] = useState("")
   const [bio, setBio] = useState("")
   const [isEditing, setIsEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     if (!user) return
@@ -35,13 +44,13 @@ export default function Profile() {
     getProfileById(user.id)
       .then((data) => {
         setProfile(data)
+        setStoreProfile(data)
         setUsername(data.username)
         setBio(data.bio ?? "")
       })
       .catch(() => setError("No se pudo cargar el perfil"))
-  }, [user])
+  }, [user, setStoreProfile])
 
-  // Protección de ruta
   if (!loadingAuth && !user) {
     return <Navigate to="/login" replace />
   }
@@ -54,6 +63,8 @@ export default function Profile() {
     )
   }
 
+  const safeProfile = profile
+
   async function handleSave() {
     if (!user) return
 
@@ -63,12 +74,14 @@ export default function Profile() {
     try {
       await updateProfile(user.id, { username, bio })
 
-      setProfile((prev) =>
-        prev
-          ? { ...prev, username, bio }
-          : prev
-      )
+      const updatedProfile = {
+        ...safeProfile,
+        username,
+        bio,
+      }
 
+      setProfile(updatedProfile)
+      setStoreProfile(updatedProfile)
       setIsEditing(false)
     } catch {
       setError("Error al guardar los cambios")
@@ -78,15 +91,45 @@ export default function Profile() {
   }
 
   function handleCancel() {
-    setUsername(profile.username)
-    setBio(profile.bio ?? "")
+    setUsername(safeProfile.username)
+    setBio(safeProfile.bio ?? "")
     setIsEditing(false)
+  }
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!user) return
+
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingAvatar(true)
+    setError(null)
+
+    try {
+      const publicUrl = await uploadAvatar(user.id, file)
+      await updateAvatar(user.id, publicUrl)
+
+      const updatedProfile = {
+        ...safeProfile,
+        avatar_url: publicUrl,
+      }
+
+      setProfile(updatedProfile)
+      setStoreProfile(updatedProfile)
+    } catch {
+      setError("Error al subir el avatar")
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
+
+  function openFilePicker() {
+    fileInputRef.current?.click()
   }
 
   return (
     <main className="min-h-screen bg-black px-6 py-24 flex justify-center">
       <div className="w-full max-w-3xl space-y-8">
-
 
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-white">
@@ -103,6 +146,43 @@ export default function Profile() {
           )}
         </div>
 
+        <Card className="bg-neutral-900 border-neutral-800">
+          <CardHeader>
+            <CardTitle className="text-white">
+              Avatar
+            </CardTitle>
+          </CardHeader>
+
+          <CardContent className="flex flex-col items-center gap-4">
+            {safeProfile.avatar_url ? (
+              <img
+                src={safeProfile.avatar_url}
+                alt="Avatar del usuario"
+                className="h-24 w-24 rounded-full object-cover border border-neutral-700"
+              />
+            ) : (
+              <div className="h-24 w-24 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-2xl font-bold text-orange-400">
+                {safeProfile.username.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
+
+            <Button
+              variant="outline"
+              onClick={openFilePicker}
+              disabled={uploadingAvatar}
+            >
+              {uploadingAvatar ? "Subiendo..." : "Cambiar avatar"}
+            </Button>
+          </CardContent>
+        </Card>
 
         <Card className="bg-neutral-900 border-neutral-800">
           <CardHeader>
@@ -114,18 +194,17 @@ export default function Profile() {
           <CardContent className="space-y-4 text-sm text-neutral-300">
             <div>
               <span className="text-neutral-400">Correo electrónico</span>
-              <p className="text-white">{profile.email ?? "—"}</p>
+              <p className="text-white">{safeProfile.email ?? "—"}</p>
             </div>
 
             <div>
               <span className="text-neutral-400">Miembro desde</span>
               <p className="text-white">
-                {new Date(profile.created_at).toLocaleDateString()}
+                {new Date(safeProfile.created_at).toLocaleDateString()}
               </p>
             </div>
           </CardContent>
         </Card>
-
 
         <Card className="bg-neutral-900 border-neutral-800">
           <CardHeader>
@@ -147,7 +226,7 @@ export default function Profile() {
                   className="bg-neutral-800 border-neutral-700 text-white"
                 />
               ) : (
-                <p className="text-white">@{profile.username}</p>
+                <p className="text-white">@{safeProfile.username}</p>
               )}
             </div>
 
@@ -162,7 +241,7 @@ export default function Profile() {
                 />
               ) : (
                 <p className="text-white">
-                  {profile.bio ?? "Sin descripción"}
+                  {safeProfile.bio ?? "Sin descripción"}
                 </p>
               )}
             </div>
@@ -193,7 +272,6 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-
         <Card className="bg-neutral-900 border-neutral-800">
           <CardHeader>
             <CardTitle className="text-white">
@@ -206,7 +284,7 @@ export default function Profile() {
               className="bg-orange-500/10 text-orange-400 border border-orange-500/30"
               title="El rol determina los permisos dentro de la plataforma"
             >
-              {profile.role}
+              {safeProfile.role}
             </Badge>
           </CardContent>
         </Card>
