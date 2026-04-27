@@ -7,7 +7,6 @@ export const AuthSection = () => {
         <section className="landing-section-alt">
             <div className="landing-section-alt-container">
 
-                {/* Visual */}
                 <div className="landing-auth-visual">
                     <div className="auth-metric">
                         <span className="auth-metric-title">Cartas guardadas</span>
@@ -25,7 +24,6 @@ export const AuthSection = () => {
                     </div>
                 </div>
 
-                {/* Texto + CTA */}
                 <div>
                     <h2 className="landing-section-alt-title">
                         Desbloquea todas las funcionalidades

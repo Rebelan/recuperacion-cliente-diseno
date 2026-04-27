@@ -5,7 +5,6 @@ export const Footer = () => {
         <footer className="footer">
             <div className="footer-container">
 
-                {/* Brand */}
                 <div>
                     <div className="footer-brand">
                         AncientVault YGO
@@ -16,7 +15,7 @@ export const Footer = () => {
                     </p>
                 </div>
 
-                {/* Links */}
+                {/* Cambiar por Link */}
                 <div className="footer-links">
                     <span className="text-white font-medium mb-2">Plataforma</span>
                     <a href="#" className="footer-link">Inicio</a>
@@ -24,7 +23,7 @@ export const Footer = () => {
                     <a href="#" className="footer-link">Crear cuenta</a>
                 </div>
 
-                {/* Info */}
+
                 <div className="footer-links">
                     <span className="text-white font-medium mb-2">Proyecto</span>
                     <span className="footer-text">
