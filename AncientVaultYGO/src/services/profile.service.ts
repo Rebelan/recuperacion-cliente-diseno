@@ -13,3 +13,18 @@ export async function getProfileById(userId: string) {
 
   return data
 }
+
+
+export async function updateProfile(
+  userId: string,
+  data: { username?: string; bio?: string }
+) {
+  const { error } = await supabase
+    .from("profiles")
+    .update(data)
+    .eq("id", userId)
+
+  if (error) {
+    throw error
+  }
+}
