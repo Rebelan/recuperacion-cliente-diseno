@@ -4,6 +4,8 @@ import { Landing } from "./pages/Landing"
 import Login from "./pages/auth/Login"
 import Register from "./pages/auth/Register"
 import Profile from "./pages/Profile"
+import { AuthLayout } from "./layouts/AuthLayout"
+import { AppLayout } from "./layouts/AppLayout"
 
 
 
@@ -12,16 +14,17 @@ export const router = createBrowserRouter([
     path: "/",
     element: <Landing />,
   },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />
-  },
-  {
-    path: "/profile",
-    element: <Profile />
-  },
+{
+  element: <AuthLayout />,
+  children: [
+    {path: "/login", element: <Login />},
+    {path: "/register", element: <Register />},
+  ],
+},
+{
+  element: <AppLayout />,
+  children: [
+    {path: "/profile", element: <Profile />},
+  ]
+}
 ])
