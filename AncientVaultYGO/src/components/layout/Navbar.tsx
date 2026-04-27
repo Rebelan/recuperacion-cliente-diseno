@@ -47,7 +47,7 @@ export const Navbar = () => {
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-neutral-800 bg-black/70 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div className="flex w-full items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         <Link to="/" className="text-lg font-bold text-orange-500">
           AncientVault YGO
         </Link>
@@ -56,9 +56,7 @@ export const Navbar = () => {
           {!user && (
             <>
               <Link to="/login">
-                <Button variant="outline">
-                  Iniciar sesión
-                </Button>
+                <Button variant="outline">Iniciar sesión</Button>
               </Link>
 
               <Link to="/register">
@@ -71,34 +69,29 @@ export const Navbar = () => {
 
           {user && (
             <>
-              <div className="flex items-center gap-3">
+              <Link
+                to="/profile"
+                className="flex items-center gap-3 rounded-full px-2 py-1 transition hover:bg-neutral-900"
+                title="Ir al perfil"
+              >
                 <span className="text-sm text-white">
                   {loadingProfile ? "Cargando..." : `@${profile?.username}`}
                 </span>
 
-                <Link
-                  to="/profile"
-                  className="block transition hover:scale-105"
-                  title="Ir al perfil"
-                >
-                  {profile?.avatar_url ? (
-                    <img
-                      src={profile.avatar_url}
-                      alt="Avatar del usuario"
-                      className="h-8 w-8 rounded-full border border-neutral-700 object-cover hover:border-orange-400"
-                    />
-                  ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-sm font-bold text-orange-400 hover:border-orange-400">
-                      {profile?.username?.charAt(0).toUpperCase() ?? "U"}
-                    </div>
-                  )}
-                </Link>
-              </div>
+                {profile?.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt="Avatar del usuario"
+                    className="h-9 w-9 rounded-full border border-neutral-700 object-cover transition hover:border-orange-400"
+                  />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-sm font-bold text-orange-400 transition hover:border-orange-400">
+                    {profile?.username?.charAt(0).toUpperCase() ?? "U"}
+                  </div>
+                )}
+              </Link>
 
-              <Button
-                variant="destructive"
-                onClick={handleLogout}
-              >
+              <Button variant="destructive" onClick={handleLogout}>
                 Logout
               </Button>
             </>
