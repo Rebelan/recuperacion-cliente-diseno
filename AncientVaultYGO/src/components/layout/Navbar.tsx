@@ -78,44 +78,54 @@ export const Navbar = () => {
           )}
 
           {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className="flex items-center gap-3 rounded-full px-2 py-1 transition hover:bg-neutral-900 focus:outline-none"
-                  title="Menú de usuario"
+            <>
+              <Link to="/collection">
+                <Button variant="outline">Mi colección</Button>
+              </Link>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-3 rounded-full px-2 py-1 transition hover:bg-neutral-900 focus:outline-none"
+                    title="Menú de usuario"
+                  >
+                    <span className="text-sm text-white">
+                      {loadingProfile ? "Cargando..." : `@${profile?.username}`}
+                    </span>
+
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt="avatar"
+                        className="h-9 w-9 rounded-full"
+                      />
+                    ) : (
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-sm font-bold text-orange-400">
+                        {profile?.username?.charAt(0).toUpperCase() ?? "U"}
+                      </div>
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                  align="end"
+                  className="w-44 border-neutral-800 bg-neutral-950 text-white"
                 >
-                  <span className="text-sm text-white">
-                    {loadingProfile ? "Cargando..." : `@${profile?.username}`}
-                  </span>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      Ver perfil
+                    </Link>
+                  </DropdownMenuItem>
 
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt="avatar" className="h-9 w-9 rounded-full" />
-                  ) : (
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-sm font-bold text-orange-400">
-                      {profile?.username?.charAt(0).toUpperCase() ?? "U"}
-                    </div>
-                  )}
-                </button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent
-                align="end"
-                className="w-44 border-neutral-800 bg-neutral-950 text-white"
-              >
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer">
-                    Ver perfil
-                  </Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="cursor-pointer text-red-500 focus:text-red-500"
-                >
-                  Cerrar sesión
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer text-red-500 focus:text-red-500"
+                  >
+                    Cerrar sesión
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           )}
         </div>
       </div>
