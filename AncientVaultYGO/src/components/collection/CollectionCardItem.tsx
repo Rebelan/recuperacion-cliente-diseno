@@ -4,9 +4,10 @@ import type { CollectionCard } from "../../types/collection"
 
 type CollectionCardItemProps = {
   card: CollectionCard
+  onClick: () => void
 }
 
-export const CollectionCardItem = ({ card }: CollectionCardItemProps) => {
+export const CollectionCardItem = ({ card, onClick }: CollectionCardItemProps) => {
   const imageSrc = getCollectionCardImageUrl(card.image_path)
 
   return (
@@ -14,6 +15,7 @@ export const CollectionCardItem = ({ card }: CollectionCardItemProps) => {
       <HoverCardTrigger asChild>
         <button
           type="button"
+          onClick={onClick}
           className="group overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 text-left transition hover:border-orange-500/40"
         >
           <div className="aspect-3/4 w-full overflow-hidden bg-black">

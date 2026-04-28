@@ -12,13 +12,28 @@ import {
     DialogHeader,
     DialogTitle,
 } from "../components/ui/dialog"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "../components/ui/alert-dialog"
 
 import { useAuthStore } from "../store/auth.store"
 import {
     getCollectionCardsByUser,
     createCollectionCard,
+    updateCollectionCard,
+    deleteCollectionCard,
 } from "../services/collection.service"
-import { uploadCollectionCardImage } from "../services/collection-image.service"
+import {
+    uploadCollectionCardImage,
+    deleteCollectionCardImage,
+} from "../services/collection-image.service"
 import { CollectionCardItem } from "../components/collection/CollectionCardItem"
 
 import type { CollectionCard } from "../types/collection"
@@ -51,10 +66,21 @@ export default function Collection() {
     const [loadingCards, setLoadingCards] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
+    // Dialog de crear
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-    const [submitting, setSubmitting] = useState(false)
+    const [submittingCreate, setSubmittingCreate] = useState(false)
 
-    // Form
+    // Dialog de detalle / edición
+    const [selectedCard, setSelectedCard] = useState<CollectionCard | null>(null)
+    const [isCardDialogOpen, setIsCardDialogOpen] = useState(false)
+    const [isEditingCard, setIsEditingCard] = useState(false)
+    const [submittingEdit, setSubmittingEdit] = useState(false)
+
+    // Alert dialog de borrado
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+    const [submittingDelete, setSubmittingDelete] = useState(false)
+
+    // Formulario de crear
     const [name, setName] = useState("")
     const [cardType, setCardType] = useState("Monster")
     const [rarity, setRarity] = useState("")
@@ -64,7 +90,17 @@ export default function Collection() {
     const [description, setDescription] = useState("")
     const [imageFile, setImageFile] = useState<File | null>(null)
 
-    
+    // Formulario de editar
+    const [editName, setEditName] = useState("")
+    const [editCardType, setEditCardType] = useState("Monster")
+    const [editRarity, setEditRarity] = useState("")
+    const [editAttribute, setEditAttribute] = useState("")
+    const [editAtk, setEditAtk] = useState("")
+    const [editDef, setEditDef] = useState("")
+    const [editDescription, setEditDescription] = useState("")
+    const [editImageFile, setEditImageFile] = useState<File | null>(null)
+
+    // Filtros
     const [search, setSearch] = useState("")
     const [filterType, setFilterType] = useState("")
     const [filterRarity, setFilterRarity] = useState("")
@@ -94,7 +130,7 @@ export default function Collection() {
         })
     }, [cards, search, filterType, filterRarity])
 
-    function resetForm() {
+    function resetCreateForm() {
         setName("")
         setCardType("Monster")
         setRarity("")
@@ -103,6 +139,30 @@ export default function Collection() {
         setDef("")
         setDescription("")
         setImageFile(null)
+    }
+
+    function fillEditForm(card: CollectionCard) {
+        setEditName(card.name)
+        setEditCardType(card.card_type)
+        setEditRarity(card.rarity ?? "")
+        setEditAttribute(card.attribute ?? "")
+        setEditAtk(card.atk !== null ? String(card.atk) : "")
+        setEditDef(card.def !== null ? String(card.def) : "")
+        setEditDescription(card.description ?? "")
+        setEditImageFile(null)
+    }
+
+    function openCardDialog(card: CollectionCard) {
+        setSelectedCard(card)
+        fillEditForm(card)
+        setIsEditingCard(false)
+        setIsCardDialogOpen(true)
+    }
+
+    function closeCardDialog() {
+        setSelectedCard(null)
+        setIsEditingCard(false)
+        setIsCardDialogOpen(false)
     }
 
     async function handleCreateCard(e: React.FormEvent) {
@@ -114,7 +174,7 @@ export default function Collection() {
             return
         }
 
-        setSubmitting(true)
+        setSubmittingCreate(true)
         setError(null)
 
         try {
@@ -145,13 +205,82 @@ export default function Collection() {
             })
 
             setCards((prev) => [createdCard, ...prev])
-            resetForm()
+            resetCreateForm()
             setIsAddDialogOpen(false)
         } catch (err) {
             console.error(err)
             setError("No se pudo crear la carta")
         } finally {
-            setSubmitting(false)
+            setSubmittingCreate(false)
+        }
+    }
+
+    async function handleUpdateCard(e: React.FormEvent) {
+        e.preventDefault()
+
+        if (!selectedCard || !user) return
+        if (!editName.trim()) {
+            setError("El nombre de la carta es obligatorio")
+            return
+        }
+
+        setSubmittingEdit(true)
+        setError(null)
+
+        try {
+            let imagePath = selectedCard.image_path
+
+            if (editImageFile) {
+                imagePath = await uploadCollectionCardImage(user.id, editImageFile)
+            }
+
+            const updatedCard = await updateCollectionCard(selectedCard.id, {
+                name: editName.trim(),
+                card_type: editCardType,
+                attribute: editAttribute || null,
+                atk: editAtk ? Number(editAtk) : null,
+                def: editDef ? Number(editDef) : null,
+                rarity: editRarity || null,
+                description: editDescription.trim() || null,
+                image_path: imagePath,
+            })
+
+            setCards((prev) =>
+                prev.map((card) => (card.id === updatedCard.id ? updatedCard : card))
+            )
+
+            setSelectedCard(updatedCard)
+            fillEditForm(updatedCard)
+            setIsEditingCard(false)
+        } catch (err) {
+            console.error(err)
+            setError("No se pudo actualizar la carta")
+        } finally {
+            setSubmittingEdit(false)
+        }
+    }
+
+    async function handleDeleteCard() {
+        if (!selectedCard) return
+
+        setSubmittingDelete(true)
+        setError(null)
+
+        try {
+            if (selectedCard.image_path) {
+                await deleteCollectionCardImage(selectedCard.image_path)
+            }
+
+            await deleteCollectionCard(selectedCard.id)
+
+            setCards((prev) => prev.filter((card) => card.id !== selectedCard.id))
+            setIsDeleteDialogOpen(false)
+            closeCardDialog()
+        } catch (err) {
+            console.error(err)
+            setError("No se pudo eliminar la carta")
+        } finally {
+            setSubmittingDelete(false)
         }
     }
 
@@ -183,7 +312,7 @@ export default function Collection() {
                         </Button>
                     </div>
 
-                    {/* Filters */}
+                    {/* Filtros */}
                     <div className="grid gap-3 sm:grid-cols-3">
                         <Input
                             value={search}
@@ -223,7 +352,7 @@ export default function Collection() {
                 {/* Error */}
                 {error && <p className="text-sm text-red-500">{error}</p>}
 
-                {/* Empty state */}
+                {/* Estado vacío */}
                 {!error && cards.length === 0 && (
                     <Card className="bg-neutral-900 border-neutral-800">
                         <CardHeader>
@@ -241,7 +370,7 @@ export default function Collection() {
                     </Card>
                 )}
 
-                {/* No results */}
+                {/* Sin resultados */}
                 {!error && cards.length > 0 && filteredCards.length === 0 && (
                     <Card className="bg-neutral-900 border-neutral-800">
                         <CardContent className="py-6 text-neutral-300">
@@ -254,12 +383,16 @@ export default function Collection() {
                 {!error && filteredCards.length > 0 && (
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {filteredCards.map((card) => (
-                            <CollectionCardItem key={card.id} card={card} />
+                            <CollectionCardItem
+                                key={card.id}
+                                card={card}
+                                onClick={() => openCardDialog(card)}
+                            />
                         ))}
                     </div>
                 )}
 
-                {/* Add card dialog */}
+                {/* Dialog de crear */}
                 <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                     <DialogContent className="max-w-2xl border-neutral-800 bg-neutral-950 text-white">
                         <DialogHeader>
@@ -268,7 +401,6 @@ export default function Collection() {
 
                         <form onSubmit={handleCreateCard} className="space-y-6">
                             <div className="grid gap-4 sm:grid-cols-2">
-                                {/* Name */}
                                 <div className="space-y-2 sm:col-span-2">
                                     <Label className="text-neutral-300">Nombre</Label>
                                     <Input
@@ -279,7 +411,6 @@ export default function Collection() {
                                     />
                                 </div>
 
-                                {/* Type */}
                                 <div className="space-y-2">
                                     <Label className="text-neutral-300">Tipo de carta</Label>
                                     <select
@@ -295,7 +426,6 @@ export default function Collection() {
                                     </select>
                                 </div>
 
-                                {/* Rarity */}
                                 <div className="space-y-2">
                                     <Label className="text-neutral-300">Rareza</Label>
                                     <select
@@ -312,7 +442,6 @@ export default function Collection() {
                                     </select>
                                 </div>
 
-                                {/* Attribute */}
                                 <div className="space-y-2">
                                     <Label className="text-neutral-300">Atributo</Label>
                                     <select
@@ -329,7 +458,6 @@ export default function Collection() {
                                     </select>
                                 </div>
 
-                                {/* ATK */}
                                 <div className="space-y-2">
                                     <Label className="text-neutral-300">ATK</Label>
                                     <Input
@@ -341,7 +469,6 @@ export default function Collection() {
                                     />
                                 </div>
 
-                                {/* DEF */}
                                 <div className="space-y-2">
                                     <Label className="text-neutral-300">DEF</Label>
                                     <Input
@@ -353,7 +480,6 @@ export default function Collection() {
                                     />
                                 </div>
 
-                                {/* Image */}
                                 <div className="space-y-2 sm:col-span-2">
                                     <Label className="text-neutral-300">Imagen (opcional)</Label>
                                     <Input
@@ -364,7 +490,6 @@ export default function Collection() {
                                     />
                                 </div>
 
-                                {/* Description */}
                                 <div className="space-y-2 sm:col-span-2">
                                     <Label className="text-neutral-300">Descripción</Label>
                                     <Textarea
@@ -379,10 +504,10 @@ export default function Collection() {
                             <div className="flex gap-3">
                                 <Button
                                     type="submit"
-                                    disabled={submitting}
+                                    disabled={submittingCreate}
                                     className="flex-1 bg-orange-500 text-black hover:bg-orange-400"
                                 >
-                                    {submitting ? "Guardando..." : "Guardar carta"}
+                                    {submittingCreate ? "Guardando..." : "Guardar carta"}
                                 </Button>
 
                                 <Button
@@ -390,7 +515,7 @@ export default function Collection() {
                                     variant="outline"
                                     className="flex-1 text-black"
                                     onClick={() => {
-                                        resetForm()
+                                        resetCreateForm()
                                         setIsAddDialogOpen(false)
                                     }}
                                 >
@@ -400,6 +525,237 @@ export default function Collection() {
                         </form>
                     </DialogContent>
                 </Dialog>
+
+
+                {/* Dialog de detalle / edición */}
+                <Dialog
+                    open={isCardDialogOpen}
+                    onOpenChange={(open) => {
+                        setIsCardDialogOpen(open)
+                        if (!open) {
+                            setIsEditingCard(false)
+                        }
+                    }}
+                >
+                    <DialogContent className="max-w-2xl border-neutral-800 bg-neutral-950 text-white">
+                        <DialogHeader>
+                            <DialogTitle>
+                                {isEditingCard ? "Editar carta" : selectedCard?.name}
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        {selectedCard && !isEditingCard && (
+                            <div className="space-y-6">
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <Label className="text-neutral-300">Nombre</Label>
+                                        <p className="text-white">{selectedCard.name}</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">Tipo de carta</Label>
+                                        <p className="text-white">{selectedCard.card_type}</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">Rareza</Label>
+                                        <p className="text-white">{selectedCard.rarity ?? "—"}</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">Atributo</Label>
+                                        <p className="text-white">{selectedCard.attribute ?? "—"}</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">ATK</Label>
+                                        <p className="text-white">{selectedCard.atk ?? "—"}</p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">DEF</Label>
+                                        <p className="text-white">{selectedCard.def ?? "—"}</p>
+                                    </div>
+
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <Label className="text-neutral-300">Descripción</Label>
+                                        <p className="text-white">
+                                            {selectedCard.description ?? "Sin descripción"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="button"
+                                        className="flex-1 bg-orange-500 text-black hover:bg-orange-400"
+                                        onClick={() => setIsEditingCard(true)}
+                                    >
+                                        Editar
+                                    </Button>
+
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        className="flex-1"
+                                        onClick={() => setIsDeleteDialogOpen(true)}
+                                    >
+                                        Eliminar
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {selectedCard && isEditingCard && (
+                            <form onSubmit={handleUpdateCard} className="space-y-6">
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <Label className="text-neutral-300">Nombre</Label>
+                                        <Input
+                                            value={editName}
+                                            onChange={(e) => setEditName(e.target.value)}
+                                            className="bg-neutral-900 border-neutral-800 text-white"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">Tipo de carta</Label>
+                                        <select
+                                            value={editCardType}
+                                            onChange={(e) => setEditCardType(e.target.value)}
+                                            className="h-10 w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 text-sm text-white outline-none"
+                                        >
+                                            {CARD_TYPES.map((type) => (
+                                                <option key={type} value={type}>
+                                                    {type}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">Rareza</Label>
+                                        <select
+                                            value={editRarity}
+                                            onChange={(e) => setEditRarity(e.target.value)}
+                                            className="h-10 w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 text-sm text-white outline-none"
+                                        >
+                                            <option value="">Selecciona rareza</option>
+                                            {RARITIES.map((rarityItem) => (
+                                                <option key={rarityItem} value={rarityItem}>
+                                                    {rarityItem}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">Atributo</Label>
+                                        <select
+                                            value={editAttribute}
+                                            onChange={(e) => setEditAttribute(e.target.value)}
+                                            className="h-10 w-full rounded-md border border-neutral-800 bg-neutral-900 px-3 text-sm text-white outline-none"
+                                        >
+                                            <option value="">Selecciona atributo</option>
+                                            {ATTRIBUTES.map((attributeItem) => (
+                                                <option key={attributeItem} value={attributeItem}>
+                                                    {attributeItem}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">ATK</Label>
+                                        <Input
+                                            type="number"
+                                            value={editAtk}
+                                            onChange={(e) => setEditAtk(e.target.value)}
+                                            className="bg-neutral-900 border-neutral-800 text-white"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-neutral-300">DEF</Label>
+                                        <Input
+                                            type="number"
+                                            value={editDef}
+                                            onChange={(e) => setEditDef(e.target.value)}
+                                            className="bg-neutral-900 border-neutral-800 text-white"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <Label className="text-neutral-300">Descripción</Label>
+                                        <Textarea
+                                            value={editDescription}
+                                            onChange={(e) => setEditDescription(e.target.value)}
+                                            className="bg-neutral-900 border-neutral-800 text-white"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2 sm:col-span-2">
+                                        <Label className="text-neutral-300">Cambiar imagen</Label>
+                                        <Input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => setEditImageFile(e.target.files?.[0] ?? null)}
+                                            className="bg-neutral-900 border-neutral-800 text-white"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <Button
+                                        type="submit"
+                                        disabled={submittingEdit}
+                                        className="flex-1 bg-orange-500 text-black hover:bg-orange-400"
+                                    >
+                                        {submittingEdit ? "Guardando..." : "Guardar cambios"}
+                                    </Button>
+
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="flex-1 text-black"
+                                        onClick={() => {
+                                            fillEditForm(selectedCard)
+                                            setIsEditingCard(false)
+                                        }}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </div>
+                            </form>
+                        )}
+                    </DialogContent>
+                </Dialog>
+
+
+                {/* Confirmación de borrado */}
+                <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                    <AlertDialogContent className="border-neutral-800 bg-neutral-950 text-white">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>¿Eliminar carta?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-neutral-400">
+                                Esta acción eliminará la carta de tu colección y no se puede deshacer.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <AlertDialogFooter>
+                            <AlertDialogCancel className="border-neutral-800 bg-transparent text-white">
+                                Cancelar
+                            </AlertDialogCancel>
+
+                            <AlertDialogAction
+                                onClick={handleDeleteCard}
+                                className="bg-red-600 text-white hover:bg-red-500"
+                            >
+                                {submittingDelete ? "Eliminando..." : "Sí, eliminar"}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
         </main>
     )
