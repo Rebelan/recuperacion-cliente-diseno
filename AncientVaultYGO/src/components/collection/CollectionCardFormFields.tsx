@@ -50,7 +50,7 @@ export const CollectionCardFormFields = ({
   showImageField = true,
 }: CollectionCardFormFieldsProps) => {
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
       <div className="space-y-2 sm:col-span-2">
         <Label className="text-neutral-300">Nombre</Label>
         <Input
