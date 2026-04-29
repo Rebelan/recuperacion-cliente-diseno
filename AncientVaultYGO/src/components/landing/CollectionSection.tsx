@@ -24,10 +24,6 @@ export const CollectionSection = () => {
                         </li>
                         <li className="landing-section-list-item">
                             <span className="landing-section-bullet" />
-                            Marca favoritas
-                        </li>
-                        <li className="landing-section-list-item">
-                            <span className="landing-section-bullet" />
                             Accede a tu colección desde cualquier dispositivo
                         </li>
                     </ul>

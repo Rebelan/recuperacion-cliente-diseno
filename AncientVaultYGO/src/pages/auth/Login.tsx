@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react'
 
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
@@ -6,9 +7,6 @@ import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Link, useNavigate } from "react-router-dom"
 import { signIn } from '../../services/auth.service'
-
-
-
 
 export default function Login() {
   const navigate = useNavigate()
@@ -32,7 +30,6 @@ export default function Login() {
       return
     }
 
-    // De momento redirige al home
     navigate("/")
   }
 
@@ -82,12 +79,20 @@ export default function Login() {
             </Button>
           </form>
 
-          <p className="mt-6 text-sm text-neutral-400 text-center">
-            ¿No tienes cuenta?{" "}
-            <Link to="/register" className="text-orange-500 hover:underline">
-              Crear cuenta
-            </Link>
-          </p>
+          <div className="mt-6 space-y-3 text-sm text-center">
+            <p className="text-neutral-400">
+              ¿No tienes cuenta?{" "}
+              <Link to="/register" className="text-orange-500 hover:underline">
+                Crear cuenta
+              </Link>
+            </p>
+
+            <p>
+              <Link to="/" className="text-neutral-400 hover:text-white hover:underline">
+                Volver al inicio
+              </Link>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </main>

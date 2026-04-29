@@ -14,7 +14,7 @@ export const AuthSection = () => {
                     </div>
 
                     <div className="auth-metric">
-                        <span className="auth-metric-title">Favoritas</span>
+                        <span className="auth-metric-title">Usuarios</span>
                         <span className="auth-metric-value">24</span>
                     </div>
 

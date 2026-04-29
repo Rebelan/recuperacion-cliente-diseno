@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuthStore } from "../../store/auth.store"
@@ -57,20 +58,25 @@ export const Navbar = () => {
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-neutral-800 bg-black/70 backdrop-blur">
-      <div className="flex w-full items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link to="/" className="text-lg font-bold text-orange-500">
+      <div className="flex w-full items-center justify-center sm:justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <Link to="/" className="hidden sm:block text-lg font-bold text-orange-500">
           AncientVault YGO
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {!user && (
             <>
               <Link to="/login">
-                <Button variant="outline">Iniciar sesión</Button>
+                <Button
+                  variant="outline"
+                  className="h-9 px-3 text-sm sm:h-10 sm:px-4"
+                >
+                  Iniciar sesión
+                </Button>
               </Link>
 
               <Link to="/register">
-                <Button className="bg-orange-500 text-black hover:bg-orange-400">
+                <Button className="h-9 px-3 text-sm bg-orange-500 text-black hover:bg-orange-400 sm:h-10 sm:px-4">
                   Crear cuenta
                 </Button>
               </Link>
@@ -79,23 +85,25 @@ export const Navbar = () => {
 
           {user && (
             <>
-              <Link to="/collection">
-                <Button variant="outline">Mi colección</Button>
-              </Link>
-              
-              {profile?.role === "admin" && (
-                <Link to="/admin">
-                  <Button variant="outline">Admin</Button>
+              <div className="hidden sm:flex items-center gap-4">
+                <Link to="/collection">
+                  <Button variant="outline">Mi colección</Button>
                 </Link>
-              )}
+
+                {profile?.role === "admin" && (
+                  <Link to="/admin">
+                    <Button variant="outline">Admin</Button>
+                  </Link>
+                )}
+              </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="flex items-center gap-3 rounded-full px-2 py-1 transition hover:bg-neutral-900 focus:outline-none"
+                    className="flex items-center justify-center sm:justify-start gap-0 sm:gap-3 rounded-full px-1 sm:px-2 py-1 transition hover:bg-neutral-900 focus:outline-none"
                     title="Menú de usuario"
                   >
-                    <span className="text-sm text-white">
+                    <span className="hidden sm:block text-sm text-white">
                       {loadingProfile ? "Cargando..." : `@${profile?.username}`}
                     </span>
 
@@ -103,7 +111,7 @@ export const Navbar = () => {
                       <img
                         src={profile.avatar_url}
                         alt="avatar"
-                        className="h-9 w-9 rounded-full"
+                        className="h-9 w-9 rounded-full object-cover"
                       />
                     ) : (
                       <div className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-700 bg-neutral-800 text-sm font-bold text-orange-400">
@@ -117,6 +125,21 @@ export const Navbar = () => {
                   align="end"
                   className="w-44 border-neutral-800 bg-neutral-950 text-white"
                 >
+                  <DropdownMenuItem asChild className="sm:hidden">
+                    <Link to="/collection" className="cursor-pointer">
+                      Mi colección
+                    </Link>
+                  </DropdownMenuItem>
+
+
+                  {profile?.role === "admin" && (
+                    <DropdownMenuItem asChild className="sm:hidden">
+                      <Link to="/admin" className="cursor-pointer">
+                        Admin
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+
                   <DropdownMenuItem asChild>
                     <Link to="/profile" className="cursor-pointer">
                       Ver perfil

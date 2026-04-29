@@ -88,12 +88,23 @@ export default function Register() {
             </Button>
           </form>
 
-          <p className="mt-6 text-sm text-neutral-400 text-center">
-            ¿Ya tienes cuenta?{" "}
-            <Link to="/login" className="text-orange-500 hover:underline">
-              Iniciar sesión
-            </Link>
-          </p>
+
+          <div className="mt-6 space-y-3 text-sm text-center">
+            <p className="text-neutral-400">
+              ¿Ya tienes cuenta?{" "}
+              <Link to="/login" className="text-orange-500 hover:underline">
+                Iniciar sesión
+              </Link>
+            </p>
+
+            <p>
+              <Link to="/" className="text-neutral-400 hover:text-white hover:underline">
+                Volver al inicio
+              </Link>
+            </p>
+          </div>
+
+
         </CardContent>
       </Card>
     </main>
