@@ -220,7 +220,7 @@ export default function AdminUsers() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 text-black"
                   onClick={() => {
                     setIsEditDialogOpen(false)
                     setSelectedUser(null)
