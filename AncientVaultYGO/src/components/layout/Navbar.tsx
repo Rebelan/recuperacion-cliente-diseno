@@ -82,6 +82,12 @@ export const Navbar = () => {
               <Link to="/collection">
                 <Button variant="outline">Mi colección</Button>
               </Link>
+              
+              {profile?.role === "admin" && (
+                <Link to="/admin">
+                  <Button variant="outline">Admin</Button>
+                </Link>
+              )}
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

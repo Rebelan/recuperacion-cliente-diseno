@@ -40,4 +40,3 @@ export async function updateAvatar(userId: string, avatarUrl: string) {
     throw error
   }
 }
-

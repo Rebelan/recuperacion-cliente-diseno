@@ -1,7 +1,7 @@
+
 import { create } from "zustand"
 import type { Session, User } from "@supabase/supabase-js"
 import type { Profile } from "../types/profile"
-
 
 type AuthState = {
   session: Session | null
@@ -25,7 +25,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({
       session,
       user: session?.user ?? null,
-      loading: false,
     }),
 
   setProfile: (profile) =>
