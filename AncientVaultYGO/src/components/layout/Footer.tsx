@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Footer = () => {
     return (
@@ -18,9 +19,15 @@ export const Footer = () => {
                 {/* Cambiar por Link */}
                 <div className="footer-links">
                     <span className="text-white font-medium mb-2">Plataforma</span>
-                    <a href="#" className="footer-link">Inicio</a>
-                    <a href="#" className="footer-link">Iniciar sesión</a>
-                    <a href="#" className="footer-link">Crear cuenta</a>
+                    <Link to="/">
+                        <button className='footer-link'>Inicio</button>
+                    </Link>
+                    <Link to="/login">
+                        <button className='footer-link'>Iniciar sesión</button>
+                    </Link>
+                    <Link to="/register">
+                        <button className='footer-link'>Registrarse</button>
+                    </Link>
                 </div>
 
 
