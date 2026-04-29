@@ -59,8 +59,9 @@ export const Navbar = () => {
   return (
     <header className="fixed top-0 z-50 w-full border-b border-neutral-800 bg-black/70 backdrop-blur">
       <div className="flex w-full items-center justify-center sm:justify-between px-4 py-4 sm:px-6 lg:px-8">
-        <Link to="/" className="hidden sm:block text-lg font-bold text-orange-500">
-          AncientVault YGO
+        <Link to="/" className="hidden sm:block">
+          <img src="/images/logo.png" alt="YGO logo" 
+                className="h-12 w-auto object-contain"/>
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-4">
