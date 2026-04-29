@@ -1,0 +1,196 @@
+/* Cosas del hero */
+
+.hero-section {
+    @apply relative min-h-screen overflow-hidden flex items-center justify-center px-6 pt-16;
+}
+
+.hero-bg {
+
+    @apply absolute inset-0 bg-[url('/images/exodiaWP.png')] bg-cover bg-center
+}
+
+.hero-overlay {
+    @apply absolute inset-0 bg-black/60
+}
+
+.hero-gradient-bottom {
+    @apply absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-black to-transparent;
+}
+
+
+.hero-title {
+    @apply mb-6 text-5xl font-bold tracking-tight text-white;
+    filter: drop-shadow(0 0 30px rgba(249, 115, 22, 0.35));
+}
+
+
+.hero-subtitle {
+    @apply mb-10 text-lg leading-relaxed text-gray-200;
+}
+
+
+.hero-cta-primary {
+    @apply bg-orange-500 text-black transition;
+}
+
+
+.hero-cta-primary:hover {
+    @apply bg-orange-400;
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+}
+
+/* Cambio a collection */
+
+
+.landing-section {
+    @apply relative w-full bg-black py-24;
+}
+
+.landing-section-container {
+    @apply mx-auto max-w-6xl px-6 grid grid-cols-1 gap-12 items-center;
+}
+
+@media (min-width: 768px) {
+    .landing-section-container {
+        @apply grid-cols-2;
+    }
+}
+
+.landing-section-title {
+    @apply mb-6 text-3xl font-bold text-white;
+}
+
+.landing-section-text {
+    @apply mb-6 text-gray-300 leading-relaxed;
+}
+
+.landing-section-list {
+    @apply space-y-3 text-gray-200;
+}
+
+.landing-section-list-item {
+    @apply flex items-center gap-3;
+}
+
+.landing-section-bullet {
+    @apply h-2 w-2 rounded-full bg-orange-500;
+}
+
+.landing-section-visual {
+    @apply relative aspect-4/5 rounded-lg bg-neutral-900 border border-neutral-800;
+}
+
+/* Mockeo de carta */
+
+.card-mock {
+    @apply relative w-full h-full rounded-xl overflow-hidden bg-neutral-900 border border-neutral-800 shadow-xl;
+}
+
+.card-mock-image {
+    @apply absolute inset-0 bg-cover bg-center bg-[url('/images/cards/blue-eyes.jpg')];
+}
+
+.card-mock-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent;
+}
+
+.card-mock-footer {
+    @apply absolute bottom-0 left-0 right-0 p-4;
+}
+
+.card-mock-title {
+    @apply text-sm font-semibold text-white;
+}
+
+.card-mock-subtitle {
+    @apply text-xs text-neutral-300;
+}
+
+/* Segunda seccion de collection de la landing */
+
+
+.landing-section-alt {
+    @apply relative w-full bg-black py-24;
+}
+
+.landing-section-alt-container {
+    @apply mx-auto max-w-6xl px-6 grid grid-cols-1 gap-12 items-center;
+}
+
+@media (min-width: 768px) {
+    .landing-section-alt-container {
+        @apply grid-cols-2;
+    }
+}
+
+.landing-section-alt-visual {
+    @apply relative aspect-[4/5] rounded-xl bg-neutral-900 border border-neutral-800;
+}
+
+.landing-section-alt-title {
+    @apply mb-6 text-3xl font-bold text-white;
+}
+
+.landing-section-alt-text {
+    @apply mb-8 text-gray-300 leading-relaxed;
+}
+
+.landing-section-alt-cta {
+    @apply flex gap-4;
+}
+
+.landing-auth-visual {
+    @apply relative rounded-xl bg-neutral-900 border border-neutral-800 p-6 grid grid-cols-2 gap-4;
+}
+
+.auth-metric {
+    @apply flex flex-col justify-center rounded-lg bg-neutral-800 p-4;
+}
+
+.auth-metric-title {
+    @apply text-xs text-neutral-400;
+}
+
+.auth-metric-value {
+    @apply text-2xl font-bold text-white;
+}
+
+.auth-panel {
+    @apply col-span-2 mt-2 rounded-lg bg-neutral-800 p-4 text-sm text-neutral-300;
+}
+
+/* Footer a partir de aqui */
+
+.footer {
+    @apply w-full bg-black border-t border-neutral-800;
+}
+
+.footer-container {
+    @apply mx-auto max-w-6xl px-6 py-12 grid grid-cols-1 gap-8;
+}
+
+@media (min-width: 768px) {
+    .footer-container {
+        @apply grid-cols-3;
+    }
+}
+
+.footer-brand {
+    @apply text-white font-semibold text-lg;
+}
+
+.footer-text {
+    @apply mt-2 text-sm text-neutral-400;
+}
+
+.footer-links {
+    @apply flex flex-col gap-2 text-sm;
+}
+
+.footer-link {
+    @apply text-neutral-300 hover:text-orange-500 transition;
+}
+
+.footer-bottom {
+    @apply mt-8 pt-6 border-t border-neutral-800 text-xs text-neutral-500 text-center;
+}
