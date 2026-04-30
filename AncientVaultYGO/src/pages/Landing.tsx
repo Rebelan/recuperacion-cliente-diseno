@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Navbar } from '../components/layout/Navbar'
 import { Hero } from '../components/landing/Hero'
 import { CollectionSection } from '../components/landing/CollectionSection'
