@@ -1,13 +1,11 @@
-import React from 'react'
 
 export const CollectionSection = () => {
     return (
-
         <section className="landing-section">
             <div className="landing-section-container">
 
                 {/* Text */}
-                <div>
+                <div data-reveal className="reveal-on-scroll reveal-left">
                     <h2 className="landing-section-title">
                         Organiza cada carta de tu colección
                     </h2>
@@ -30,15 +28,9 @@ export const CollectionSection = () => {
                 </div>
 
                 {/* Visual */}
-                <div className="landing-section-visual">
-
-
+                <div data-reveal className="landing-section-visual reveal-on-scroll reveal-right reveal-delay-1">
                     <div className="card-mock">
-
-                        <div
-                            className="card-mock-image"
-                        />
-
+                        <div className="card-mock-image" />
                         <div className="card-mock-overlay" />
 
                         <div className="card-mock-footer">
@@ -49,13 +41,10 @@ export const CollectionSection = () => {
                                 Dragón · ATK 3000 · DEF 2500
                             </div>
                         </div>
-
                     </div>
                 </div>
 
-
-                </div>
+            </div>
         </section>
-
     )
 }
