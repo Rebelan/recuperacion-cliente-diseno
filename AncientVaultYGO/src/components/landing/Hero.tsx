@@ -13,7 +13,7 @@ export const Hero = () => {
             <div className="hero-gradient-bottom" />
 
             <div className="relative z-10 max-w-3xl text-center">
-                <h1 className="hero-title">
+                <h1 className="hero-title font-squealer">
                     AncientVault YGO
                 </h1>
 

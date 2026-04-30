@@ -7,6 +7,9 @@ import Profile from "./pages/Profile"
 import { AuthLayout } from "./layouts/AuthLayout"
 import { AppLayout } from "./layouts/AppLayout"
 import Collection from "./pages/Collection"
+import { AdminRoute } from "./pages/auth/AdminRoute"
+import AdminDashboard from "./pages/admin/AdminDashboard"
+import AdminUsers from "./pages/admin/AdminUsers"
 
 
 
@@ -27,6 +30,22 @@ export const router = createBrowserRouter([
   children: [
     {path: "/profile", element: <Profile />},
     {path: "/collection", element: <Collection />},
+    {
+      path: "/admin",
+      element: (
+        <AdminRoute>
+          <AdminDashboard/>
+        </AdminRoute>
+      ),
+    },
+    {
+      path: "/admin/users",
+      element: (
+        <AdminRoute>
+          <AdminUsers/>
+        </AdminRoute>
+      ),
+    },
   ],
 },
 ])
