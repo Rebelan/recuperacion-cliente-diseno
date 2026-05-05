@@ -30,7 +30,7 @@ export default function Login() {
       return
     }
 
-    navigate("/")
+    navigate("/collection")
   }
 
   return (
